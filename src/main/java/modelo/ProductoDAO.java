@@ -59,7 +59,7 @@ public class ProductoDAO {
         OutputStream outputStream=null;
         BufferedInputStream bufferedInputStream =null;
         BufferedOutputStream bufferedOutputStream =null;
-        response.setContentType("image/*");
+        response.setContentType("image/png");
         try{
             outputStream=response.getOutputStream();
             con=cn.getConnection();
@@ -97,6 +97,9 @@ public class ProductoDAO {
        }
    }
      public boolean actualizarProducto(Producto producto){
+         System.out.println("nombreact: "+producto.getNombre());
+          System.out.println("nombreact: "+producto.getId());
+           System.out.println("imagen: "+producto.getImagen());
         String sql="UPDATE producto SET nombre=?, descripcion=?,precio=?,image=? WHERE id=?";
        try{
            con=cn.getConnection();
@@ -105,15 +108,36 @@ public class ProductoDAO {
            ps.setString(2,producto.getDescripcion());
            ps.setDouble(3,producto.getPrecio());
            ps.setBlob(4,producto.getImagen());
+           
             ps.setInt(5, producto.getId());
-           ps.execute();
+            System.out.println(""+ producto.getId());
+            ps.executeUpdate();
            return true;
        }catch(SQLException e){
            System.out.println(e.toString());
            return false;
        }
    }
-   
+   public boolean actualizarProductoSinImg(Producto producto){
+         System.out.println("nombreact: "+producto.getNombre());
+          System.out.println("nombreact: "+producto.getId());
+           System.out.println("imagen: "+producto.getImagen());
+        String sql="UPDATE producto SET nombre=?, descripcion=?,precio=? WHERE id=?";
+       try{
+           con=cn.getConnection();
+            ps=con.prepareStatement(sql);
+           ps.setString(1,producto.getNombre());
+           ps.setString(2,producto.getDescripcion());
+           ps.setDouble(3,producto.getPrecio());
+            ps.setInt(4, producto.getId());
+            System.out.println(""+ producto.getId());
+            ps.executeUpdate();
+           return true;
+       }catch(SQLException e){
+           System.out.println(e.toString());
+           return false;
+       }
+   }
    public boolean eliminarProducto(int _id){
         PreparedStatement ps;
          String sql="DELETE FROM producto WHERE id=?";
@@ -127,6 +151,32 @@ public class ProductoDAO {
        }catch(SQLException e){
            System.out.println(e.toString());
            return false;
+       }
+   }
+   
+   public Producto mostrarProducto(int _id){
+       PreparedStatement ps;
+       ResultSet rs;
+       Producto p = null;
+       
+       try{
+           con=cn.getConnection();
+           ps = con.prepareStatement("SELECT * FROM producto WHERE id =?");
+           ps.setInt(1, _id);
+           rs = ps.executeQuery();
+           System.out.println("");
+           while(rs.next()){
+           p =new Producto();
+           p.setId(rs.getInt(1));
+           p.setNombre(rs.getString(2));
+           p.setDescripcion(rs.getString(3));
+           p.setPrecio(rs.getDouble(4));
+           p.setArchivoimg2(rs.getBytes(5));
+           }
+           return p;
+       }catch(SQLException e){
+           System.out.println(e.toString());
+           return null;
        }
    }
 }

@@ -71,7 +71,7 @@
 
                             for (int i = 0; i < resultado.size(); i++) {
 
-                                String ruta = "ProductoController?accion=modificar&id=" + resultado.get(i).getId();
+                                String ruta = "ProductoController?accion=Modificar&id=" + resultado.get(i).getId();
                                 String rutaE = "ProductoController?accion=Eliminar&id=" + resultado.get(i).getId();
                         %>
                         <tr>
@@ -79,7 +79,7 @@
                             <td class="text-center"><%=resultado.get(i).getNombre()%></td>
                             <td class="text-center"><%=resultado.get(i).getDescripcion()%></td>
                             <td class="text-center"><%=resultado.get(i).getPrecio()%></td>
-                            <td class="text-center"><img src="ImageController?id=<%=resultado.get(i).getId()%>" width="250" height="230"></td>
+                            <td class="text-center"><a href="ImageController?id=<%=resultado.get(i).getId() %>" target="_blank"><img src="ImageController?id=<%=resultado.get(i).getId()%>" width="250" height="230"></td>
                             <td class="text-center"><a class="btn btn-warning" href=<%=ruta%>>Editar</a>
                                 <a class="btn btn-danger" href=<%=rutaE%>>Eliminar</a></td>
 

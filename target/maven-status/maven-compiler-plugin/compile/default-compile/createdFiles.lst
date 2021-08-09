@@ -1,6 +1,5 @@
 controlador\ImageController.class
 modelo\Producto.class
-controlador\ProductoController.class
 config\Conexion.class
 modelo\ProductoDAO.class
 config\Prueba.class

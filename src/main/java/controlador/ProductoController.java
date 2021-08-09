@@ -29,8 +29,6 @@ import javax.servlet.http.Part;
 @MultipartConfig
 public class ProductoController extends HttpServlet {
 
-    
-
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -50,12 +48,17 @@ public class ProductoController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-ProductoDAO productoDAO = new ProductoDAO();
-    Producto producto = new Producto();
+        ProductoDAO productoDAO = new ProductoDAO();
+        Producto producto = new Producto();
         String accion = request.getParameter("accion");
         RequestDispatcher dispactcher = null;
+        int id;
+         String nombre;
+          String descripcion;
+           Double precio;
+           InputStream inputStream = null;
         if (accion == null || accion.isEmpty()) {
-             dispactcher = request.getRequestDispatcher("Vistas/productos.jsp");
+            dispactcher = request.getRequestDispatcher("Vistas/productos.jsp");
         } else {
             switch (accion) {
                 case "Listar":
@@ -64,19 +67,31 @@ ProductoDAO productoDAO = new ProductoDAO();
                 case "Nuevo":
                     dispactcher = request.getRequestDispatcher("Vistas/nuevo.jsp");
                     break;
+                case "Modificar":
+                    int productoID = Integer.parseInt(request.getParameter("id"));
+                    System.out.println("productoID: "+productoID);
+                    producto = productoDAO.mostrarProducto(productoID);
+                    System.out.println("producto: "+producto);
+                    request.setAttribute("row", producto);
+                    boolean boo = false;
+                    if (producto.getArchivoimg2() != null) {
+                        boo = true;
+                    }
+                    request.setAttribute("row2", boo);
+                    
+                     dispactcher = request.getRequestDispatcher("Vistas/modificar.jsp");
+                    break;
                 case "Insertar":
                     System.out.println("entro");
-                    InputStream inputStream = null;
                     
-                    String nombre = request.getParameter("nombre");
-                    String descripcion = request.getParameter("descripcion");
-                   
-                    Double precio= Double.parseDouble(request.getParameter("precio"));
-                    
-                    
-                    
+
+                   nombre = request.getParameter("nombre");
+                descripcion = request.getParameter("descripcion");
+
+                    precio = Double.parseDouble(request.getParameter("precio"));
+
                     try {
-                        
+
                         Part filePart = request.getPart("image");
                         if (filePart.getSize() > 0) {
                             System.out.println(filePart.getName());
@@ -92,19 +107,57 @@ ProductoDAO productoDAO = new ProductoDAO();
                     } else {
                         producto.setImagen(null);
                     }
-                    Producto p = new Producto(nombre,descripcion,precio,inputStream);
+                    Producto p = new Producto(nombre, descripcion, precio, inputStream);
                     productoDAO.insertarProducto(p);
 
                     dispactcher = request.getRequestDispatcher("ProductoController?accion=Listar");
 
                     break;
+                    case "Editar":
+                    System.out.println("entro");
+                    inputStream = null;
+                    id = Integer.parseInt(request.getParameter("id"));
+                    nombre = request.getParameter("nombre");
+                        System.out.println("nombremo "+nombre);
+                    descripcion = request.getParameter("descripcion");
+
+                    precio = Double.parseDouble(request.getParameter("precio"));
+
+                    try {
+
+                        Part filePart = request.getPart("image");
+                        if (filePart.getSize() > 0) {
+                            System.out.println(filePart.getName());
+                            System.out.println(filePart.getSize());
+                            System.out.println(filePart.getContentType());
+                            inputStream = filePart.getInputStream();
+                        }
+                    } catch (Exception ex) {
+                        System.out.println("fichero: " + ex.getMessage());
+                    }
+                        System.out.println("inputStream "+inputStream);
+                    if (inputStream != null) {
+                        producto.setImagen(inputStream);
+                        Producto p1 = new Producto(id,nombre, descripcion, precio, inputStream);
+                        productoDAO.actualizarProducto(p1);
+                    } else {
+                        producto.setImagen(null);
+                        Producto p1 = new Producto(id,nombre, descripcion, precio);
+                        productoDAO.actualizarProductoSinImg(p1);
+                    }
+                    
+                    
+
+                   dispactcher = request.getRequestDispatcher("ProductoController?accion=Listar");
+
+                    break;
                 case "Eliminar":
-                    int id = Integer.parseInt(request.getParameter("id"));
+                   id = Integer.parseInt(request.getParameter("id"));
                     productoDAO.eliminarProducto(id);
                     dispactcher = request.getRequestDispatcher("Vistas/productos.jsp");
                     break;
                 default:
-                     dispactcher = request.getRequestDispatcher("ProductoController?accion=Listar");
+                    dispactcher = request.getRequestDispatcher("ProductoController?accion=Listar");
                     //request.getRequestDispatcher("ProductoController?accion=Listar").forward(request, response);
                     break;
             }

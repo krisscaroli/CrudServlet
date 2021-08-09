@@ -3,10 +3,10 @@
     Created on : Jul 25, 2021, 5:08:50 PM
     Author     : kriss
 --%>
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@page import="modelo.ProductoDAO"%>
 <%@page import="modelo.Producto"%>
-<%@page import="modelo.A"%>
-<%@page import="modelo.Alumnos"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -43,38 +43,52 @@
              </nav>
         <div class="container">
            
-        
-            <h1>Productos</h1>
-        <%
-            String id = request.getParameter ("id"); // Use request para obtener 
-            int mid;
-            mid =Integer.parseInt(id);
-            Producto resultado=null;
-            ProductoDAO productoDAO = new ProductoDAO(); 
-            resultado =  productoDAO.mostrarProducto(mid);
+       <%
             
-            
+                Producto resultado = (Producto) request.getAttribute("row");
+                
+           
+            boolean icono = false;
+            try {
+                icono = (Boolean) request.getAttribute("row2");
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
         %>
   
             <h1 class="text-center">Modificar Productos</h1>
             <div class="row">
-                <form class="p-5" action="ProductoController?accion=Actualizar" method="POST">
+                <form class="p-5" action="ProductoController?accion=Editar" method="POST" enctype="multipart/form-data">
                         <div class="mb-3">
                           <label for="id" class="form-label"></label>
                           <input type="hidden" class="form-control" id="id" name="id"  value=<%=resultado.getId()%>>
                         </div>
                         <div class="mb-3">
-                          <label for="nombre1" class="form-label">Nombre</label>
-                          <input type="text" class="form-control" id="nombre1" name="nombre"  value=<%=resultado.getNombre()%>>
+                          <label for="nombre" class="form-label">Nombre</label>
+                          <input type="text" class="form-control" id="nombre" name="nombre"  value="<%=resultado.getNombre()%>">
                         </div>
                         <div class="mb-3">
-                          <label for="apellido" class="form-label">Apellido</label>
-                          <input type="text" class="form-control" id="apellido" name="apellido" value=<%=resultado.getApellido()%>>
+                          <label for="descripcion" class="form-label">Descripción</label>
+                          <input type="text" class="form-control" id="descripcion" name="descripcion" value="<%=resultado.getDescripcion()%>">
                         </div>
                         <div class="mb-3">
-                          <label for="email" class="form-label">Email</label>
-                          <input type="email" class="form-control" id="email" name="email" value=<%=resultado.getEmail()%>>
+                          <label for="precio" class="form-label">Precio</label>
+                          <input type="precio" class="form-control" id="email" name="precio" value="<%=resultado.getPrecio()%>">
                         </div>
+                         <div class="mb-3">
+                          <label for="id">Seleccionar Imagen: *</label> 
+                                <%
+                                    if (icono) {
+                                %>
+                                <a href="ImageController?id=<%out.print(resultado.getId()); %>" target="_blank"> Ver Imagen</a>
+                                <%
+                                    } else {
+                                        out.print("Sin Imagen");
+                                    }
+                                %>
+                            
+                                <input type="file" name="image" value="" id="btn" class="btn" />
+                            </div>
                         <button type="submit" class="btn btn-primary">Modificar</button>
                       </form>
             </div>
